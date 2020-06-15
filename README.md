@@ -1,22 +1,15 @@
-# Welcome to Defold
+# Welcome to Defold Shooter
 
-This project was created from the "mobile" project template. This means that the settings in ["game.project"](defold://open?path=/game.project) have been changed to be suitable for a mobile game:
+This project is a very simple shooter game build with Defold
 
-- The screen size is set to 640x1136
-- The projection is set to Fixed Fit
-- Orientation is fixed vertically
-- Android and iOS icons are set
-- iOS launch images (blank ones) are set
-- Mouse click/single touch is bound to action "touch"
-- A simple script in a game object is set up to receive and react to input
-- Accelerometer input is turned off (for better battery life)
+## How to run this project
+1. Install Defold
+2. Clone this project
+3. Open the project with Defold
+4. Build and Run
 
-[Build and run](defold://build) to see it in action. You can of course alter these settings to fit your needs.
-
-Check out [the documentation pages](https://defold.com/learn) for examples, tutorials, manuals and API docs.
-
-If you run into trouble, help is available in [our forum](https://forum.defold.com).
-
-Happy Defolding!
-
----
+## The features included
+- A simple game Flow
+- Controlling the player ship using touch
+- Generating various enemy in different level
+- 2 kind of enemy with 2 kind of weapon
