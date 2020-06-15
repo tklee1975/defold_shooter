@@ -1,0 +1,70 @@
+-- local speed = 230
+go.property("speed", 200)
+go.property("targeting", false)
+
+
+local function handle_hit() 
+	-- msg.post(#, message_id)
+	local p = go.get_position()
+	factory.create("factory#hit_factory", p)
+	go.delete()
+end
+
+function init(self)
+	-- Add initialization code here
+	-- Remove this function if not needed
+	-- local p = go.get_position()
+	-- p.x = 100
+	-- p.y = 10
+	-- go.set_position(p)
+	-- sound.play("#sound")
+
+	local use_ship_pos = go.get("/ship#script", "is_active") and self.targeting
+	
+	local target_pos
+	if(use_ship_pos) then
+		target_pos = go.get_position("/ship")
+	else 
+		target_pos = go.get_position()
+		target_pos.y = -10
+	end 
+	
+	local this_pos = go.get_position()
+	local dir_vec = target_pos - this_pos
+	self.velocity_vec = vmath.normalize(dir_vec) * self.speed
+	
+end
+
+function final(self)
+	-- print("ship_bullet: final")	
+end
+
+function is_outside_screen(p) 
+	if p.y < -32 or p.y > 800 then
+		return true
+	elseif p.x < 0 or p.x > 400 then 
+		return true
+	else 
+		return false
+	end
+end
+
+function update(self, dt)
+	local p = go.get_position()
+
+	p = p + self.velocity_vec * dt
+	
+	-- remove the object if out of bound
+	if is_outside_screen(p) then
+		go.delete()
+	else
+		go.set_position(p)
+	end 
+end
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("collision_response") then
+		handle_hit()
+	end	
+end

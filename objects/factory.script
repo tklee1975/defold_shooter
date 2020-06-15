@@ -1,0 +1,111 @@
+require "module.game_logic"
+
+--- 
+local function add_enemy_to_pool(self, enemy_id)
+	table.insert(self.enemy_pool, enemy_id)
+end
+
+local function remove_enemy_from_pool(self, enemy_id)
+	table.remove(self.enemy_pool, enemy_id)
+end
+
+local function clear_remain_enemies(self)
+	go.delete(self.enemy_pool, true)
+end
+
+--- 
+
+function init(self)
+	-- Add initialization code here
+	-- Remove this function if not needed
+	self.enemy_pool = {}
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	-- Add update code here
+	-- Remove this function if not needed
+end
+
+function on_input(self, action_id, action)
+	-- Add input-handling code here
+	-- Remove this function if not needed
+end
+
+function on_reload(self)
+	-- Add reload-handling code here
+	-- Remove this function if not needed
+end
+
+function spawn_enemy_row(self, row_data, y) 
+	local screen_w = 320 
+	local monster_size = 40
+
+	-- pprint("spawn_enemy_row: row_data=" .. row_data)
+	
+	local len = string.len(row_data)
+
+	local start_x = (320 - (monster_size * len)) / 2 + monster_size / 2
+
+	local pos = vmath.vector3(start_x, y, 0)
+
+	local count = 0
+	for i=1, len do
+		local type_value = string.sub(row_data, i, i)
+		-- print("i=", i, " value=", type_value)
+		
+		if(type_value ~= "_") then 
+			local factory_id = string.format("factory#enemy_%s_factory", type_value)
+			local new_id = factory.create(factory_id, pos, nil, {type = hash(type_value)} )
+
+			add_enemy_to_pool(self, new_id)
+			
+			count = count + 1;
+		end
+		pos.x = pos.x + monster_size
+	end
+
+	return count
+	
+end
+
+function handle_enemy_spawn(self, level) 
+	print("handle enemy spawning for level: ", level)
+
+	-- Prevent old remain enemy still here 
+	clear_remain_enemies(self)
+	
+	local data = get_level_data(level)
+	pprint("level_data=", data)
+
+	local total_count = 0
+	
+	local y = 500
+	for k,v in ipairs(data) do
+		-- print(k,v)
+		--pprint("data: k=", k, " v=",v)
+		local count = spawn_enemy_row(self, v, y)
+
+		total_count = total_count + count
+		y = y - 60
+	end
+
+	msg.post("game_manager#script", "update_enemy_count", { enemy_count = total_count})
+end
+
+
+
+function on_message(self, message_id, message, sender)
+	print("factory: on_message!!")
+	print("factory: message=", message)
+
+	if message_id == hash("spawn_enemy") then
+		handle_enemy_spawn(self, message.level)
+	end
+end
+
+

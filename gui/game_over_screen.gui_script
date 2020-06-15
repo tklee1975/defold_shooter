@@ -1,0 +1,45 @@
+
+local function set_score(self, game_score) 
+	local n = gui.get_node("score_text")
+
+	gui.set_text(n, string.format("SCORE: %06d", game_score))
+end
+
+
+function init(self)
+	-- Add initialization code here
+	-- Remove this function if not needed
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	-- Add update code here
+	-- Remove this function if not needed
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("set_score") then
+		set_score(self, message.score)
+	end	
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("touch") and action.pressed then 
+		local button = gui.get_node("play_again_button")
+
+		if gui.pick_node(button, action.x, action.y) then 
+			-- print("start_button is click")			
+			msg.post("game_manager", "start_game")
+		end
+
+	end
+end
+
+function on_reload(self)
+	-- Add input-handling code here
+	-- Remove this function if not needed
+end

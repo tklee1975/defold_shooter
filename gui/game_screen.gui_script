@@ -1,0 +1,104 @@
+local life_spacing = 20
+
+local function set_score(self, new_score) 
+	local n = gui.get_node("score_text")
+
+	gui.set_text(n, string.format("%06d", new_score))
+end
+
+local function get_next_life_pos(self) 
+	if(self.lives == 0) then 
+		return vmath.vector3(20, 544, 0)
+	end
+
+	local pos = gui.get_position("life_" .. self.lives)
+	pos.x = pos.x + life_spacing 
+	return pos
+end 
+
+local function increase_life(self, inc_count) 
+	-- 
+
+	-- 
+	local start_idx = self.lives + 1
+	local end_idx = self.lives + inc_count
+	local node_pos = get_next_life_pos(self)
+
+	local template = gui.get_node("life")
+	
+	for i=start_idx,end_idx do
+		-- one clone for each life
+		local new_node = gui.clone(template)
+		-- set the node id so we can find and delete them later
+		gui.set_id(new_node, "life_" .. i)
+		gui.set_position(new_node, node_pos)
+
+		node_pos.x = node_pos.x + life_spacing
+	end
+end
+
+local function decrease_life(self, dec_count) 
+	local start_idx = self.lives
+	local end_idx = self.lives - dec_count + 1
+
+	if (start_idx == 0) then
+		return
+	end
+
+	for i=start_idx, end_idx, -1 do
+		local n = gui.get_node("life_" .. i)
+		gui.delete_node(n)
+	end
+end
+
+
+local function set_lives(self, life_count) 
+	if(life_count == self.lives) then
+		return
+	end
+
+	if(life_count > self.lives) then 
+		increase_life(self, life_count - self.lives)
+	else 
+		decrease_life(self, self.lives - life_count)
+	end
+
+	self.lives = life_count		-- update the count 
+
+end
+
+
+
+function init(self)
+	self.lives = 0
+	-- Add initialization code here
+	-- Remove this function if not needed
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	-- Add update code here
+	-- Remove this function if not needed
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("set_lives") then
+		set_lives(self, message.lives)
+	elseif message_id == hash("set_score") then
+		set_score(self, message.score)
+	end
+end
+
+function on_input(self, action_id, action)
+	-- Add input-handling code here
+	-- Remove this function if not needed
+end
+
+function on_reload(self)
+	-- Add input-handling code here
+	-- Remove this function if not needed
+end

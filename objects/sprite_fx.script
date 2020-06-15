@@ -1,0 +1,21 @@
+function init(self)
+	-- Add initialization code here
+	-- Remove this function if not needed
+	local url = msg.url("#sprite")
+	sprite.play_flipbook(url, "default", on_anime_complete)
+	sound.play("#sound")
+end
+
+
+function on_message(self, message_id, message, sender)
+	print("on_message message_id=", message_id)
+	if(message_id == hash("animation_done")) then 
+		-- print("on_message anime done")
+		go.delete()
+	end
+end
+
+function final(self)
+	sound.stop("#sound")	
+end
+

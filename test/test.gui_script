@@ -1,0 +1,145 @@
+function init(self)
+	-- Add initialization code here
+	msg.post(".", "acquire_input_focus")
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	-- Add update code here
+	-- Remove this function if not needed
+end
+
+function on_message(self, message_id, message, sender)
+	-- Add message-handling code here
+	-- Remove this function if not needed
+	print("in message: msg=", message, " message_id=", message_id);
+end
+
+function test_msgReceiver(self)
+	-- msg.post("test_go#monster", "disable");	
+	msg.post("#monster", "disable");		-- Also okay - same as test_go#monster
+	-- msg.post("test_go2#monster", "disable");		-- Hide the monster in other object 
+end
+
+function test_animation(self)
+	-- Reference: 
+	-- msg.post("test_go#monster", "disable");	
+	-- msg.post("#monster", "disable");		-- Also okay - same as test_go#monster
+	-- msg.post("test_go2#monster", "disable");		-- Hide the monster in other object 
+	-- go.animate("test_go2", "alpha", go.PLAYBACK_LOOP_FORWARD, 0)
+	print("Testing animation")
+	msg.post("/ship", "test_anime")
+	
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("touch") and action.pressed then 
+		local button = gui.get_node("button1")
+		
+		if gui.pick_node(button, action.x, action.y) then 
+			print("button1 is click")			
+			test_spawn_bullet()
+			return true
+		end
+
+		button = gui.get_node("button2")
+		if gui.pick_node(button, action.x, action.y) then 
+			test_hit_enemy()
+			return true
+		end
+
+		button = gui.get_node("button3")
+		if gui.pick_node(button, action.x, action.y) then 
+			test_spawn_enemy()
+			return true
+		end
+
+		button = gui.get_node("button4")
+		if gui.pick_node(button, action.x, action.y) then 
+			msg.post("ship", "show")
+			return true
+		end
+
+		button = gui.get_node("button5")
+		if gui.pick_node(button, action.x, action.y) then 
+			test_msgReceiver(self)
+			return true
+		end
+
+		button = gui.get_node("button6")
+		if gui.pick_node(button, action.x, action.y) then 
+			test_animation(self)
+			return true
+		end
+
+		button = gui.get_node("button7")
+		if gui.pick_node(button, action.x, action.y) then 
+			test_hit_enemy(self)
+			return true
+		end
+
+		-- test_enemy_bullet
+		button = gui.get_node("button8")
+		if gui.pick_node(button, action.x, action.y) then 
+			test_enemy_bullet(self)
+			return true
+		end
+
+		button = gui.get_node("button9")
+		if gui.pick_node(button, action.x, action.y) then 
+			test_gui(self)
+			return true
+		end
+	end
+end
+
+function test_spawn_enemy() 
+	print("Spawn Enemy")
+	-- msg.post("factory", "spawn_enemy", {level = 3})
+	-- msg.post("factory", "spawn_enemy", {level = 1})
+	msg.post("factory", "spawn_enemy", {level = 2})
+
+end
+
+function on_reload(self)
+	-- Add input-handling code here
+	-- Remove this function if not needed
+end
+
+function test_spawn_bullet() 
+	local p = vmath.vector3(20, 100, 0)
+	factory.create("factory#bullet_factory", p)
+end
+
+function test_spawn_hit() 
+	local p = vmath.vector3(20, 200, 0)
+	factory.create("factory#hit_factory", p)
+end
+
+function test_hit_enemy(self) 
+	msg.post("enemy", "hit")
+
+	local p = vmath.vector3(20, 300, 0)
+	factory.create("factory#hit_factory", p)
+	-- factory
+	-- local p = vmath.vector3(20, 100, 0)
+	-- factory.create("factory#bullet_factory", p)
+end
+
+
+function test_enemy_bullet(self) 
+
+	local p = vmath.vector3(20, 300, 0)
+	--factory.create("factory#enemy_bullet_factory", p)
+end
+
+
+function test_gui(self) 
+	msg.post("#game_screen", "set_score", { score = 100 })
+	msg.post("#game_screen", "set_lives", { lives = 2 } )
+end
+

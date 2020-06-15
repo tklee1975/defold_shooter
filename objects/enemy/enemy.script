@@ -1,0 +1,105 @@
+local touch_offset = 0 		-- y offset from touch to the ship
+
+-- go.property("type", hash("a"))
+
+go.property("shoot_interval", 3)
+go.property("bullet_type", 1)
+go.property("hp", 1)
+go.property("score", 100)
+
+
+local function handle_attack(self, dt) 
+	self.shoot_cd = self.shoot_cd - dt
+	if(self.shoot_cd > 0) then
+		return
+	end
+
+	local p = go.get_position()
+	p.y = p.y -touch_offset			-- some offset to fire position 
+
+	local factory_id = string.format("factory#enemy_bullet%d_factory", self.bullet_type)
+
+	factory.create(factory_id, p)
+
+	self.shoot_cd = self.shoot_interval
+end
+
+
+
+local function handle_dead(self)
+	show_explosion()
+
+	msg.post("game_manager#script", "enemy_die", { score = self.score })
+	
+	go.delete()
+end
+
+local function handle_hit(self)
+	self.hp = self.hp - 1
+
+	print("on_hit: self.hp=", self.hp)
+
+	if(self.hp <= 0) then 
+		handle_dead(self)
+	end
+end
+
+
+--- 
+--- Init 
+--- 
+
+function init(self)
+	-- Add initialization code here
+	-- Remove this function if not needed
+	-- config(self)
+	
+	self.shoot_cd = self.shoot_interval
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	handle_attack(self, dt)
+end
+
+function show_explosion()
+	local p = go.get_position()
+	factory.create("factory#explosion_factory", p)
+	
+	-- msg.post("#explosion", "enable")
+	-- go.animate("#explosion", property, playback, to, easing, duration)
+	-- "#sprite", "tint.w", go.PLAYBACK_ONCE_BACKWARD, 0, go.EASING_INOUTSINE, 5, animate_end())
+	
+end
+
+
+function on_message(self, message_id, message, sender)
+	print("enemy: on_message message_id=", message_id)
+	
+	if message_id == hash("collision_response") then
+		print("enemy: collision_response");
+		handle_hit(self)
+	end
+	
+	-- if message_id == hash("animation_done") then
+	-- 	print("Animation done received! sender=", sender, " message=", message)
+	-- 	-- on_dead();
+	-- end
+
+end
+
+function on_input(self, action_id, action)
+	-- Add input-handling code here
+	-- Remove this function if not needed
+end
+
+
+
+function on_reload(self)
+	-- Add reload-handling code here
+	-- Remove this function if not needed
+end

@@ -1,0 +1,49 @@
+local speed = 230
+
+function init(self)
+	-- Add initialization code here
+	-- Remove this function if not needed
+	-- local p = go.get_position()
+	-- p.x = 100
+	-- p.y = 10
+	-- go.set_position(p)
+	sound.play("#sound")
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Remove this function if not needed
+	-- print("ship_bullet: final")
+	sound.stop("#sound")
+end
+
+
+function update(self, dt)
+	local p = go.get_position()
+	p.y = p.y + speed * dt
+
+	-- remove the object if out of bound
+	if p.y < -32 or p.y > 800 then
+		go.delete()
+	end
+
+	go.set_position(p)
+end
+
+function _on_hit_enemy() 
+	-- msg.post(#, message_id)
+	local p = go.get_position()
+	factory.create("factory#hit_factory", p)
+	go.delete()
+end
+
+function on_message(self, message_id, message, sender)
+	-- Add message-handling code here
+	-- Remove this function if not needed
+	if message_id == hash("collision_response") then
+		-- print("DEBUG: hitting enemy: msg=", message, " sender=", sender)
+		-- pprint(message)
+		-- msg.post(sender, "hit")
+		_on_hit_enemy()
+	end	
+end

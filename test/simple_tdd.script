@@ -1,0 +1,123 @@
+--- 
+
+local function test_hello(self) 
+	print("Hello Lua")
+end
+
+local ship_id = 0
+
+local function change_ship_sprite(self) 
+	ship_id =  ship_id + 1
+
+	if(ship_id > 10) then 
+		ship_id = 1
+	end 
+	
+	-- Reference:
+	local name = string.format("ship_%d", ship_id)
+	sprite.play_flipbook("#test_ship", hash(name))
+end 
+
+
+local function flipbook_done(self)
+	-- msg.post("#", "jump_completed")
+	print("flipbook_done!!")
+end
+
+local function test_anime_complete(self) 
+	-- Reference:
+	
+	sprite.play_flipbook("#sprite_fx", hash("explosion"), flipbook_done)
+end 
+
+
+local function test_fade_in(self) 
+	-- Reference:
+	print("test_fade_in")
+	
+	-- sprite.play_flipbook("#sprite_fx", hash("explosion"), flipbook_done)
+	-- go.animate(url,property,playback,to,easing,duration,[delay],[complete_function])
+	--https://forum.defold.com/t/animate-sprite-opacity-solved/1764/5
+
+	-- This is fade out 
+	-- go.animate("#boss", "tint.w", go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_LINEAR, 2, 0) 
+
+	-- This is fade in 
+	go.set("#boss", "tint.w", 0)
+	go.animate("#boss", "tint.w", go.PLAYBACK_ONCE_FORWARD, 1, go.EASING_LINEAR, 1, 0) 
+	-- playback, to, easing, duration)
+end 
+
+local ship_flag = false 
+local function test_toggle_ship(self) 
+	print("toggle ship")
+	if(ship_flag) then 
+		msg.post("ship", "hide")
+		ship_flag = false
+	else 
+		msg.post("ship", "show")
+		ship_flag = true
+	end 
+end 
+
+---- 
+function init(self)
+	
+	-- msg.post(receiver, message_id)
+	
+
+
+	self.test_list = {
+		test_hello = test_hello,
+		change_ship = change_ship_sprite,
+		anime_callback = test_anime_complete,
+		fade_in = test_fade_in,
+		toggle_ship = test_toggle_ship
+	}
+
+	print("init new_script")
+	local test_name_list = {}
+	for k,v in pairs (self.test_list) do
+		-- pprint("DEBUG: k=" .. k .. " v=" , debug.getinfo(v))
+		table.insert(test_name_list, k)
+	end
+
+	-- setup the gui 
+	msg.post("#test_nav", "setup", { target = "go", test_list = test_name_list })
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	-- Add update code here
+	-- Remove this function if not needed
+end
+
+function on_message(self, message_id, message, sender)
+	-- Add message-handling code here
+	-- Remove this function if not needed
+	-- pprint("message_id=", message_id,  " message=",  message)
+
+	for test_name, test_func in pairs (self.test_list) do
+		-- pprint("DEBUG: k=" .. k .. " v=" , debug.getinfo(v))
+		-- pprint("DEBUG: check test=" .. test_name)
+		if(message_id == hash(test_name)) then 
+			-- pprint("DEBUG: match test=" .. test_name)
+			test_func(self)
+		end 
+	end
+	
+end
+
+function on_input(self, action_id, action)
+	-- Add input-handling code here
+	-- Remove this function if not needed
+end
+
+function on_reload(self)
+	-- Add reload-handling code here
+	-- Remove this function if not needed
+end

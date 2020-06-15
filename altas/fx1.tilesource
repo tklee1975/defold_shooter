@@ -1,0 +1,20 @@
+image: "/assets/Fx/Fx1.png"
+tile_width: 38
+tile_height: 38
+tile_margin: 0
+tile_spacing: 0
+collision: ""
+material_tag: "tile"
+collision_groups: "default"
+animations {
+  id: "fx1"
+  start_tile: 1
+  end_tile: 6
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 10
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+extrude_borders: 0
+inner_padding: 0
+sprite_trim_mode: SPRITE_TRIM_MODE_OFF

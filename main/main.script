@@ -1,0 +1,26 @@
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	msg.post("@render:", "use_fixed_fit_projection", { near = -1, far = 1 })	-- For Responsive 
+
+	-- Set the default UI 
+	msg.post("ui#game_over_gui", "disable")
+	msg.post("ui#in_game_gui", "disable")
+	msg.post("ui#title_gui", "enable")
+
+	-- Adding background 
+	particlefx.play("#star_bg")
+
+	-- ken: the core logic is in game_manager 
+end
+-- 
+-- function show_title_scene()
+-- 	msg.post("#in_game_gui", "disable")
+-- 	msg.post("#title_gui", "enable")
+-- end
+-- 
+-- function show_game_scene()
+-- 	msg.post("#in_game_gui", "enable")
+-- 	msg.post("#title_gui", "disable")
+-- end
+-- 
+-- 
