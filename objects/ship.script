@@ -3,9 +3,9 @@ local shoot_interval = 0.5
 
 local TIME_TO_ACTIVE = 3
 
-local STATE_INACTIVE = 0		-- the ship is not ready 
+local STATE_INACTIVE = 0		-- the ship is not ready
 local STATE_SPAWNING = 1		-- turning from inactive to active
-local STATE_ACTIVE = 2			-- the ship is active 
+local STATE_ACTIVE = 2			-- the ship is active
 
 go.property("is_active", false)
 
@@ -14,9 +14,9 @@ require "module.math_util"
 
 
 local function handle_hit(self)
-	if(self.state ~= STATE_ACTIVE) then 
+	if(self.state ~= STATE_ACTIVE) then
 		return;
-	end 
+	end
 	print("on_hit: self.hp=", self.hp)
 
 	msg.post("#", "hide")		-- Cause the player hide
@@ -25,11 +25,11 @@ local function handle_hit(self)
 end
 
 
-function hide_player(self) 
-	
+function hide_player(self)
+
 end
 
-function show_player(self) 
+function show_player(self)
 	self.is_active = true
 	play_burner_fx()
 	msg.post("#", "acquire_input_focus")
@@ -37,14 +37,14 @@ function show_player(self)
 end
 
 
-local function shoot_logic(self, dt) 
+local function shoot_logic(self, dt)
 	self.shoot_cd = self.shoot_cd - dt
 	if(self.shoot_cd > 0) then
 		return
 	end
 
 	local p = go.get_position()
-	p.y = p.y + 30			-- some offset to fire position 
+	p.y = p.y + 30			-- some offset to fire position
 
 	factory.create("factory#bullet_factory", p)
 
@@ -60,8 +60,8 @@ local function enter_inactive(self)
 	stop_burner_fx()
 	msg.post("#", "release_input_focus")
 	msg.post(".", "disable")
-	
-end 
+
+end
 
 local function enter_spawning(self)
 	self.state = STATE_SPAWNING
@@ -71,11 +71,11 @@ local function enter_spawning(self)
 
 	go.set("#sprite", "tint.w", 0)
 	go.animate("#sprite", "tint.w", go.PLAYBACK_ONCE_FORWARD, 1,
-								go.EASING_LINEAR, TIME_TO_ACTIVE, 0) 
-	
+								go.EASING_LINEAR, TIME_TO_ACTIVE, 0)
+
 								msg.post("#", "acquire_input_focus")
 	msg.post(".", "enable")
-end 
+end
 
 local function enter_active(self)
 	self.state = STATE_ACTIVE
@@ -84,20 +84,20 @@ local function enter_active(self)
 	msg.post("#", "acquire_input_focus")
 	msg.post(".", "enable")
 	self.shoot_cd = shoot_interval
-end 
+end
 
 
-local function update_spawning(self, dt) 
+local function update_spawning(self, dt)
 	self.timer_to_active = self.timer_to_active - dt
-	if(self.timer_to_active <= 0) then 
+	if(self.timer_to_active <= 0) then
 		enter_active(self)
 	end
-end 
+end
 
 function init(self)
 	-- Add initialization code here
 	-- Remove this function if not needed
-	
+
 
 	self.shoot_cd = shoot_interval
 	self.is_holding = false
@@ -106,7 +106,7 @@ function init(self)
 
 	-- msg.post("#", "hide")
 
-	
+
 end
 
 function final(self)
@@ -120,19 +120,19 @@ function update(self, dt)
 	-- Add update code here
 	-- Remove this function if not needed
 	-- print("update: dt=", dt)
-	if(self.state == STATE_INACTIVE) then 
+	if(self.state == STATE_INACTIVE) then
 		return
 	end
 
-	if(self.state == STATE_ACTIVE) then 
+	if(self.state == STATE_ACTIVE) then
 		shoot_logic(self, dt)
-	end 
+	end
 
-	if(self.state == STATE_SPAWNING) then 
+	if(self.state == STATE_SPAWNING) then
 		update_spawning(self, dt)
-	end 
-	
-	-- Move Ship to the holding position 
+	end
+
+	-- Move Ship to the holding position
 	if self.is_holding then
 		-- print("press_position=", self.press_position)
 		move_to_new_position(self.press_position)
@@ -160,12 +160,12 @@ function on_input(self, action_id, action)
 	if action_id == hash("touch") then
 		print("ship on_input")
 
-		self.press_position = vmath.vector3(action.x, action.y, 0) 
-		
+		self.press_position = vmath.vector3(action.x, action.y, 0)
+
 		if action.pressed then
 			print("touch is on")
 			self.is_holding = true
-			
+
 			-- move_ship_to(pos)
 		elseif action.released then
 			print("touch is off")
@@ -177,12 +177,12 @@ function on_input(self, action_id, action)
 	-- Remove this function if not needed
 end
 
-function test_ship_animation(self) 
+function test_ship_animation(self)
 	-- https://forum.defold.com/t/animate-sprite-opacity-solved/1764
 	-- print("ship: testing animation")
 	-- go.animate("#sprite", "tint.w", go.PLAYBACK_LOOP_FORWARD, 0, go.EASING_OUTEXPO, 2)
 end
-	
+
 
 function on_reload(self)
 	-- Add reload-handling code here
@@ -190,40 +190,38 @@ function on_reload(self)
 end
 
 
---- 
---- Main Logic  
---- 
+---
+--- Main Logic
+---
 
 
---- 
---- Visual Logic  
---- 
+---
+--- Visual Logic
+---
 
 
-function stop_burner_fx() 
+function stop_burner_fx()
 	-- ship_burner
 	particlefx.stop("#ship_burner")
 end
 
 
-function play_burner_fx() 
+function play_burner_fx()
 	-- ship_burner
 	particlefx.play("#ship_burner")
 end
 
 
-function move_to_new_position(pos) 
+function move_to_new_position(pos)
 	clamp_pos = pos
 
 	clamp_pos.x = clamp(pos.x, 10, 300)
-	clamp_pos.y = clamp(pos.y, 10, 300)		-- ken: how to get the screen width / height 
+	clamp_pos.y = clamp(pos.y, 10, 300)		-- ken: how to get the screen width / height
 
 	go.set_position(clamp_pos)
 end
 
 
---- 
---- Main Behaviour 
---- 
-
-
+---
+--- Main Behaviour
+---
